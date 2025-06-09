@@ -111,27 +111,19 @@
  - не хватает очевидной функциональности (историчность показаний датчиков)
  - плохая производительность системы (не оптимизированный код, везде синхронное взаимодействие) - умрет на 100-1000 пользователях наверняка. 
 
+# №5. Визуализация контекста системы — диаграмма С4
+
+Диаграмма Контекста приложения Smart Home Application (As Is)
+
+![Context diagram for Smart Home Application](https://www.plantuml.com/plantuml/svg/TLFFRjCm7BxdAKovTDBQ28aJgifO3-mmf4AtS-MbfekKE97j22Q4r6t03fleXIC2JRn0LP6jMjVn2lORyVtIXgrqoo6HxU_t_KkoeGrN9eiZjibr6B0EZzD8U8z26KHPJx1zOrBzpFSLVrVlXsO_sykqK44YZP2c7YIndqPS4a5DcruKxlcjfxKsRUs-slPZherGsEgsCC53ALGz1TOpeO4AQsHDEX3l3Uk5lAzutF2p9dkRADQ9uOjj9R5WBz8q2WDkmaIoK3A8nedqXEonEOtN5aediahErbd5_hGtTkhEx2MUOpjoHpQdTMMj18R8IC3l0CnmFB8NTcOdzWeGhtC0pt5tCybaZwk3Ql04q5itbJNsmMEu_YMgndXqUPgMkC9q1QkNoJfh9zhqbUYytgOT-yCTGefyqJrdzeyRG7cAnGLiaekyPg_96AMm4tVaJc5hMH46Kw6uoPJuNvXKMeyBhNERWtmCZaFe5AKSkvEvYXio-nl1PoZWr7rczeOLFLq3I5De3U21pQ7zST59LGkfawBYRmNWfEpiZOWMxT_fej7OrK8tcmilo8IH0IMQkxc2_6LXeNHJKb8_e2NM-QjwYFLNKTy86QTk2Dz7opGZY4xO0z_3S4dXDjev3LFhX9rpJb3I9zWVW6_alk3uAmeZ1mkESdhrlK2SwioBiedilfRTCKDWe9yl-5PuxXImmdY_lN7n1MxjxBJ1kO6V1R_TNm00 "Context diagram for Smart Home Application")
+
 
 ## 3. Определение доменов и границы контекстов
 
 Опишите здесь домены, которые вы выделили.
 
 
-# Задание №5. Визуализация контекста системы — диаграмма С4
 
-Добавьте сюда диаграмму контекста в модели C4.
-
-Чтобы добавить ссылку в файл Readme.md, нужно использовать синтаксис Markdown. Это делают так:
-
-```markdown
-[Текст ссылки](URL)
-```
-
-Замените `Текст ссылки` текстом, который хотите использовать для ссылки. Вместо `URL` вставьте адрес, на который должна вести ссылка. Например:
-
-```markdown
-[Посетите Яндекс](https://ya.ru/)
-```
 
 # Задание 2. Проектирование микросервисной архитектуры
 
@@ -155,67 +147,15 @@
 
 # Задание 4. Создание и документирование API
 
-### 1. Тип API
+## 1. Тип API
 
 Укажите, какой тип API вы будете использовать для взаимодействия микросервисов. Объясните своё решение.
 
-### 2. Документация API
+## 2. Документация API
 
 Здесь приложите ссылки на документацию API для микросервисов, которые вы спроектировали в первой части проектной работы. Для документирования используйте Swagger/OpenAPI или AsyncAPI.
 
 # Задание 5. Работа с docker и docker-compose
-
-Перейдите в apps.
-
-Там находится приложение-монолит для работы с датчиками температуры. В README.md описано как запустить решение.
-
-Вам нужно:
-
-1) сделать простое приложение temperature-api на любом удобном для вас языке программирования, которое при запросе /temperature?location= будет отдавать рандомное значение температуры.
-
-Locations - название комнаты, sensorId - идентификатор названия комнаты
-
-```
-	// If no location is provided, use a default based on sensor ID
-	if location == "" {
-		switch sensorID {
-		case "1":
-			location = "Living Room"
-		case "2":
-			location = "Bedroom"
-		case "3":
-			location = "Kitchen"
-		default:
-			location = "Unknown"
-		}
-	}
-
-	// If no sensor ID is provided, generate one based on location
-	if sensorID == "" {
-		switch location {
-		case "Living Room":
-			sensorID = "1"
-		case "Bedroom":
-			sensorID = "2"
-		case "Kitchen":
-			sensorID = "3"
-		default:
-			sensorID = "0"
-		}
-	}
-```
-
-2) Приложение следует упаковать в Docker и добавить в docker-compose. Порт по умолчанию должен быть 8081
-
-3) Кроме того для smart_home приложения требуется база данных - добавьте в docker-compose файл настройки для запуска postgres с указанием скрипта инициализации ./smart_home/init.sql
-
-Для проверки можно использовать Postman коллекцию smarthome-api.postman_collection.json и вызвать:
-
-- Create Sensor
-- Get All Sensors
-
-Должно при каждом вызове отображаться разное значение температуры
-
-Ревьюер будет проверять точно так же.
+Выполнено в файле docker-compose и папке temperature-api
 
 

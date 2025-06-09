@@ -1,0 +1,21 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+title
+ <u>Context diagram</u> for Smart Home Application in common
+end title
+
+Person(user, "Пользователь")
+Person(impl, "Монтажник")
+
+System_Boundary(c1, "Smart Home") {
+    Container(main_app, "SmartHome ", "Go, PostgreSQL", "Основное приложение-монолиты")
+    Container(temperature_app, "SmartHome", "C#", "Сервис получения данных о температуре")
+}
+System(sensor, "Датчик")
+
+Rel(user, main_app, "<<Uses>>", "Смотрит показания датчиков")
+Rel(impl, main_app, "<<Uses>>", "Управляет датчиками Пользователя")
+Rel(impl, sensor, "Считывает информацию о", "")
+Rel(sensor, temperature_app, "Передает температуру в", "?")
+Rel(temperature_app, main_app, "Передает информацию в ", "HTTP")
+@enduml

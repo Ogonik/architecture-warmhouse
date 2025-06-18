@@ -1,0 +1,71 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+title
+ General <u>Context diagram</u> TO BE for Smart Home Application in common
+end title
+
+Person(user, "Клиент")
+
+
+
+Boundary(sm, "Smart Home") {
+    Person(impl, "Внедренец")
+    Person(manager, "Менеджер") 
+    Person(dev, "Член команды разработки")
+    Person(accountant, "Бухгалтер") 
+    Person(clvl, "Управляющий, ЛПР, Выгодоприобретатель")
+
+    System_Boundary(sm_bound, "Smart home Application") {
+        System(main_app, "SmartHome ", "Основное приложение", "", "React, C#, PostgreSQL")
+    }
+    System_Ext(sensor, "Датчик, совместимый с приложением")
+    System_Ext(actuator, "Актуатор, совместимый с приложением")
+}
+
+'##########
+'  КЛИЕНТ  
+'##########
+Rel_D(user, main_app, "<<Uses>>", "")
+
+
+Rel_D(user, sensor, "Покупает и подключает к приложению")
+Rel_D(user, actuator, "Покупает и подключает к приложению")
+
+'##########
+'  ВНЕДРЕНЕЦ  
+'##########
+Rel_U(impl, main_app, "<<Uses>>", "")
+
+
+Rel_U(impl, sensor, "Подключает к приложению, обслуживает")
+Rel_U(impl, actuator, "Подключает к приложению, обслуживает")
+
+'##########
+'  МЕНЕДЖЕР  
+'##########
+Rel_R(manager, main_app, "<<Uses>>", "")
+
+'##########
+'  Dev-man  
+'##########
+Rel_R(dev, main_app, "<<Uses>>", "")
+
+'##########
+'  Датчик  
+'##########
+Rel_D(sensor, main_app, "Отправляет даныне в")
+
+'##########
+'  Актуатор  
+'##########
+Rel(actuator, main_app, "Отправляет даныне в")
+
+'##########
+'  ПРИЛОЖЕНИЕ  
+'##########
+Rel_D(main_app, actuator, "Управляет")
+Rel_D(main_app, sensor, "Управляет")
+
+
+@enduml

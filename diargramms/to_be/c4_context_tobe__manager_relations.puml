@@ -1,0 +1,59 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+title
+ <u>Context diagram</u> TO BE for Smart Home Application in common
+end title
+
+Person(user, "Клиент")
+
+
+
+Boundary(sm, "Smart Home") {
+    Person(impl, "Внедренец")
+    Person(manager, "Менеджер") 
+    Person(dev, "Член команды разработки")
+    Person(accountant, "Бухгалтер") 
+    Person(clvl, "Управляющий, ЛПР, Выгодоприобретатель")
+
+    System_Boundary(sm_bound, "Smart home Application") {
+        System(main_app, "SmartHome ", "Основное приложение", "", "React, C#, PostgreSQL")
+    }
+    System_Ext(sensor, "Датчик, совместимый с приложением")
+    System_Ext(actuator, "Актуатор, совместимый с приложением")
+}
+
+'##########
+'  КЛИЕНТ  
+'##########
+Rel(user, manager, "Общается вне приложения")
+
+'##########
+'  ВНЕДРЕНЕЦ  
+'##########
+Rel(impl, manager, "Общается вне приложения ")
+
+'##########
+'  МЕНЕДЖЕР  
+'##########
+Rel(manager, main_app, "<<Uses>>", "1. Регистрируется, аутентифицируется и авторизуется в приложении")
+Rel(manager, main_app, "<<Uses>>", "2. Участвует в выполнении заявок от Пользователей")
+Rel(manager, main_app, "<<Uses>>", "3. Создает заявки для Менеджеров")
+Rel(manager, main_app, "<<Uses>>", "4. Получает агрегированную информацию об Объектах, Пользователях")
+Rel(manager, main_app, "<<Uses>>", "5. Проводит маркетинговые меропрятия (рассылки, конкурсы и т.п.)")
+
+Rel(manager, clvl, "Предоставляет отчеты приложения о работе бизнеса")
+Rel(manager, account, "Предоставляет отчеты приложения о работе бизнеса")
+
+'##########
+'  Dev-man  
+'##########
+Rel(dev, manager, "Консультирует")
+
+'##########
+'  БУХГАЛТЕР, C-Level  
+'##########
+Rel(clvl, manager, "Управляет")
+
+
+@enduml

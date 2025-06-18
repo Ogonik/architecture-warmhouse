@@ -1,0 +1,51 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+title
+ <u>Context diagram</u> TO BE for Smart Home Application in common
+end title
+
+Person(user, "Клиент")
+
+
+
+Boundary(sm, "Smart Home") {
+    Person(impl, "Внедренец")
+    Person(manager, "Менеджер") 
+
+    System_Boundary(sm_bound, "Smart home Application") {
+        System(main_app, "SmartHome ", "Основное приложение", "", "React, C#, PostgreSQL")
+    }
+    System_Ext(sensor, "Датчик, совместимый с приложением")
+    System_Ext(actuator, "Актуатор, совместимый с приложением")
+}
+
+'##########
+'  КЛИЕНТ  
+'##########
+Rel_D(user, main_app, "<<Uses>>", "1. Регистрируется, аутентифицируется и авторизуется в приложении")
+Rel_D(user, main_app, "<<Uses>>", "2. Управляет (CUD операции) Обьектами, Локациями, Датчиками, Актуаторами")
+Rel_D(user, main_app, "<<Uses>>", "3. Получает информацию о состоянии (в широком смысле) своих Объектов (в широком смысле) в момент времени")
+Rel_D(user, main_app, "<<Uses>>", "4. Получает информацию о состоянии своих Объектов, Сценариев автоматизации в прошлом на произвольную глубину")
+Rel_D(user, main_app, "<<Uses>>", "5. Управляет (СUD) Сценариями автоматизации деятельности Актуаторов")
+Rel_D(user, main_app, "<<Uses>>", "6. Получает помощь в приложении от Менеджеров //не сказано напрямую в требованиях//")
+Rel_D(user, main_app, "<<Uses>>", "7. Управляет заявками на проведение работ с привлечением Внедренцев")
+Rel_D(user, main_app, "<<Uses>>", "8. Оплачивает возможность использования приложения")
+
+
+Rel_D(user, sensor, "Покупает")
+Rel_D(user, sensor, "Подключает к приложению")
+Rel_D(user, actuator, "Покупает")
+Rel_D(user, actuator, "Подключает к приложению")
+
+Rel(user, manager, "Общается вне приложения")
+
+Rel(impl, user, "Общается вне приложения при первичной настройке приложения")
+
+'##########
+'  ПРИЛОЖЕНИЕ  
+'##########
+Rel(main_app, user, "Информирует о нештатных ситуациях")
+
+
+@enduml

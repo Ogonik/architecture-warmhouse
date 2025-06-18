@@ -1,15 +1,16 @@
 @startuml Basic Sample
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 title
- <u>Context diagram</u> for Smart Home Application in common
+ <u>Context diagram</u> AS IS for Smart Home Application in common
 end title
 
 Person(user, "Пользователь")
 Person(impl, "Монтажник")
 
-System_Boundary(c1, "Smart Home") {
-    Container(main_app, "SmartHome ", "Go, PostgreSQL", "Основное приложение-монолиты")
-    Container(temperature_app, "SmartHome", "C#", "Сервис получения данных о температуре")
+Boundary(c1, "Smart Home") {
+    System(main_app, "SmartHome ", "Основное приложение-монолит", "", "Go, PostgreSQL")
+    System(temperature_app, "SmartHome", "Сервис получения данных о температуре", "", "C#")
 }
 System(sensor, "Датчик")
 

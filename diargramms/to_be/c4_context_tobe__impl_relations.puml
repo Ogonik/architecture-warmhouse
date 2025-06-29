@@ -1,0 +1,62 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+title
+ <u>Context diagram</u> TO BE for Smart Home Application in common
+end title
+
+Person(user, "Клиент")
+
+
+
+Boundary(sm, "Smart Home") {
+    Person(impl, "Внедренец")
+    Person(manager, "Менеджер") 
+    Person(dev, "Член команды разработки")
+    Person(accountant, "Бухгалтер") 
+    Person(clvl, "Управляющий, ЛПР, Выгодоприобретатель")
+
+    System_Boundary(sm_bound, "Smart home Application") {
+        System(main_app, "SmartHome ", "Основное приложение", "", "React, C#, PostgreSQL")
+    }
+    System_Ext(sensor, "Датчик, совместимый с приложением")
+    System_Ext(actuator, "Актуатор, совместимый с приложением")
+}
+
+'##########
+'  ВНЕДРЕНЕЦ  
+'##########
+Rel(impl, main_app, "<<Uses>>", "1. Регистрируется, аутентифицируется и авторизуется в приложении")
+Rel(impl, main_app, "<<Uses>>", "2. Участвует в выполнении заявок от Менеджеров и Пользователей")
+Rel(impl, main_app, "<<Uses>>", "3. Получает информацию о состоянии (в широком смысле) сопровождаемых Объектов (в широком смысле) в момент времени")
+Rel(impl, main_app, "<<Uses>>", "4. Получает информацию о состоянии сопровождаемых Объектов, Сценариев автоматизации в прошлом на ограниченную глубину")
+
+
+Rel(impl, sensor, "Подключает к приложению")
+Rel(impl, actuator, "Подключает к приложению")
+Rel(impl, sensor, "Обслуживает")
+Rel(impl, actuator, "Обслуживает")
+
+Rel(impl, user, "Общается вне приложения при первичной настройке приложения")
+Rel(impl, manager, "Общается вне приложения ")
+
+
+'##########
+'  Dev-man  
+'##########
+Rel(dev, impl, "Консультирует")
+
+
+
+'##########
+'  БУХГАЛТЕР, C-Level  
+'##########
+Rel(clvl, impl, "Управляет")
+
+
+'##########
+'  ПРИЛОЖЕНИЕ  
+'##########
+Rel(main_app, impl, "Информирует о нештатных ситуациях")
+
+@enduml

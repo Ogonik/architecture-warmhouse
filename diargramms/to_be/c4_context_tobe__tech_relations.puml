@@ -1,0 +1,88 @@
+@startuml Basic Sample
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+title
+ <u>Context diagram</u> TO BE for Smart Home Application in common
+end title
+
+Person(user, "Клиент")
+
+
+
+Boundary(sm, "Smart Home") {
+    Person(impl, "Внедренец")
+    Person(manager, "Менеджер") 
+    Person(dev, "Член команды разработки")
+    Person(accountant, "Бухгалтер") 
+    Person(clvl, "Управляющий, ЛПР, Выгодоприобретатель")
+
+    System_Boundary(sm_bound, "Smart home Application") {
+        System(main_app, "SmartHome ", "Основное приложение", "", "React, C#, PostgreSQL")
+    }
+    System_Ext(sensor, "Датчик, совместимый с приложением")
+    System_Ext(actuator, "Актуатор, совместимый с приложением")
+}
+
+'##########
+'  КЛИЕНТ  
+'##########
+Rel(user, sensor, "Покупает")
+Rel(user, sensor, "Подключает к приложению")
+Rel(user, actuator, "Покупает")
+Rel(user, actuator, "Подключает к приложению")
+
+Rel(user, manager, "Общается вне приложения")
+
+'##########
+'  ВНЕДРЕНЕЦ  
+'##########
+Rel(impl, sensor, "Подключает к приложению")
+Rel(impl, actuator, "Подключает к приложению")
+Rel(impl, sensor, "Обслуживает")
+Rel(impl, actuator, "Обслуживает")
+
+
+
+
+'##########
+'  Dev-man  
+'##########
+Rel(dev, main_app, "<<Uses>>", "1. Проектирует, разрабатывает, тестирует, деплоит")
+Rel(dev, manager, "Консультирует")
+Rel(dev, impl, "Консультирует")
+
+
+
+'##########
+'  БУХГАЛТЕР, C-Level  
+'##########
+Rel(clvl, manager, "Управляет")
+Rel(clvl, impl, "Управляет")
+Rel(clvl, dev, "Управляет")
+
+
+'##########
+'  Датчик  
+'##########
+Rel(sensor, main_app, "Регистриуется в")
+Rel(sensor, main_app, "Отправляет даныне в")
+
+'##########
+'  Актуатор  
+'##########
+Rel(actuator, main_app, "Регистриуется в")
+Rel(actuator, main_app, "Отправляет даныне в")
+
+'##########
+'  ПРИЛОЖЕНИЕ  
+'##########
+Rel(main_app, user, "Информирует о нештатных ситуациях")
+Rel(main_app, impl, "Информирует о нештатных ситуациях")
+Rel(main_app, actuator, "Управляет")
+Rel(main_app, sensor, "Управляет")
+Rel(main_app, dev, "Предоставляет максимально подробную телеметрию своей работы")
+
+
+
+
+@enduml

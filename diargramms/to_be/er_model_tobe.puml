@@ -1,4 +1,4 @@
-@startuml Samrt Home ER Diagram
+@startuml Smart Home ER Diagram
 
 !include ..\lib\C4_Container.puml
 !include ..\lib\C4_Context.puml

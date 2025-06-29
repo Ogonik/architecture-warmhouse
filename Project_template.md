@@ -141,34 +141,46 @@
  - диаграмма контекста для технических взаимодействий элементов внутренней и внешней среды Samrt Home 
 
 
+// plantuml в какой-то момент начал плеваться на российские ip, поэтому далее только файлы. 
+Для себя настроил локальный сервер plantuml из jar файла
+
+diagramms/to_be/c4_context_tobe_general.puml
+diagramms/to_be/c4_context_tobe__user_relations.puml
+diagramms/to_be/c4_context_tobe__tech_relations.puml
+diagramms/to_be/c4_context_tobe__manager_relations.puml
+diagramms/to_be/c4_context_tobe__management_relations.puml
+diagramms/to_be/c4_context_tobe__impl_relations.puml
 
 **Диаграмма контейнеров (Containers)**
 
-Добавьте диаграмму.
+diagramms/to_be/c4_container_tobe.puml
 
 **Диаграмма компонентов (Components)**
 
-Добавьте диаграмму для каждого из выделенных микросервисов.
+diagramms/to_be/c4_component_device_values_path.puml
 
 **Диаграмма кода (Code)**
 
-Добавьте одну диаграмму или несколько.
+diagramms/to_be/c4_code.puml
 
 # Задание 3. Разработка ER-диаграммы
 
-Добавьте сюда ER-диаграмму. Она должна отражать ключевые сущности системы, их атрибуты и тип связей между ними.
+diagramms/to_be/er_model_tobe.puml
 
 # Задание 4. Создание и документирование API
 
 ## 1. Тип API
 
-Укажите, какой тип API вы будете использовать для взаимодействия микросервисов. Объясните своё решение.
+Для взаимодействия фронт сервисов и BFF используется REST API. Использование такого метода взаимодействия обусловлено стандартными требованиями к клиент-серверному взаимодействию в условиях работы пользователя-человека:
+  - ожидание обновления интерфейса по клику, 
+  - отсутствие на фронте всех необходимых пользователю данных за один начальный запрос
+  - отсутствие необходимости realtime взаимодействий фронта и бека. 
 
 ## 2. Документация API
 
-Здесь приложите ссылки на документацию API для микросервисов, которые вы спроектировали в первой части проектной работы. Для документирования используйте Swagger/OpenAPI или AsyncAPI.
+/specs/smart_home_service_name_api.yaml
 
 # Задание 5. Работа с docker и docker-compose
-Выполнено в файле docker-compose и папке temperature-api
+Выполнено в файле apps/docker-compose и папке apps/temperature-api
 
 

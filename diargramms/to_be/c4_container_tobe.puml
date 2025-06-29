@@ -1,0 +1,115 @@
+@startuml Basic Sample
+!include ../lib/C4_Container.puml
+title
+ General <u>Container diagram</u> TO BE for Smart Home Application in common
+end title
+
+Person(user, "Пользователь")
+
+
+
+Boundary(sm, "Smart Home") {
+    System_Boundary(sm_bound, "Smart home Application") {
+        Boundary(frontend, "Frontend area"){
+            Container(front_web, "Frontend SPA WEB", "React")
+            Container(front_android, "Mobile App Andriod", "React?")
+            Container(front_ios, "Mobile App iOS", "React?")
+        }
+        Boundary(backend, "Backend and DB area") {
+            Boundary(backend_security, "Backend Security layer") {
+                Container(user_gw, "User Gateway", "Nginx", "User Reverse Proxy, Authentication, Authorization")
+                Container(system_gw, "System Gateway", "Nginx", "Devices Reverse Proxy, Authentication") 
+                Container(ms_auth, "Auth* Service", "C#, Keycloak", "Authentication Authorization")
+            }    
+
+            Boundary(main_microservices, "Backend services with databases") {
+                Container(ms_bff, "General Backend For Frontend", "C#, PostgreSQL", "API Composition for frontends") 
+                Container(ms_device_actions, "Управление устройствами", "C#, no DB")    
+                Container(ms_general_backend, "Общая бизнес логика", "C#, PostgreSQL")    
+                Container(ms_automation_scenario, "Сценарии автоматизации", "C#, Camunda, PostgreSQL")    
+            }
+
+            Boundary(devices_microservices, "Backend services for devices' information") {
+                Container(ms_device_history, "Хранение временных рядов значений параметров, полученных с датчиков и актуаторов", "C#, Victoria metrics|PgSQL+TS ext", ) 
+                Container(ms_device_adapters, "Адаптеры протоколов различных устройств, агрегация, очистка данных", "C#, Postgres", ) 
+                Container(ms_storage, "Хранение видеофрагментов и других blob-файлов", "C#, Minio", ) 
+                
+                Rel(ms_storage, ms_general_backend, "Отдача видео-фрагментов", "")
+                Rel(ms_device_adapters, ms_storage, "Выгрузка видео-фрагментов", "")
+                
+                SystemQueue(smarthome_queue, "MessageBroker", "Kafka||Apache Camel based queues", )
+           
+                Rel(ms_device_history, ms_general_backend, "Отдача исторических данных", "")
+
+            }
+
+            Boundary(misc_microservices, "Platform services") {
+                Container(plt_audit, "Сервис Аудита", "C#, PostgreSQL")
+                Container(plt_logging, "Сервис Логирования", "Opensearch")
+                Container(plt_front_logging, "Сервис Логирования Ошибок FrontEnd", "Sentry")
+                Container(plt_tracing, "Сервис Трассировки", "Zipkin|Jaeger")
+                Container(plt_metrics, "Сервис технологических метрик", "OpenTelemetry, Prometheus, Graphana")
+                Container(plt_business_metrics, "Cервис бизнес-метрик", "Prometheus, Graphana")   
+            }
+            
+            Rel_D(devices_microservices, misc_microservices, "Отгрузка технологических данных", "")
+            Rel_D(main_microservices, misc_microservices, "Отгрузка технологических данных", "")
+            Rel_D(backend_security, misc_microservices, "Отгрузка технологических данных", "")
+            Rel_D(frontend, misc_microservices, "Отгрузка технологических данных", "")
+            
+            System_Ext(sensor, "Датчик, совместимый с приложением")
+            System_Ext(actuator, "Актуатор, совместимый с приложением")
+
+            Rel(ms_automation_scenario, ms_device_actions, "Управление устройствами", "")
+            Rel(ms_device_actions, system_gw, "Управление устройствами", "")
+            Rel(system_gw, sensor, "Управление датчиками", "")
+            Rel(system_gw, actuator, "Управление актуаторами", "")
+
+            Rel(system_gw, ms_device_adapters, "Получение потоковых данных, атомарных данных о значениях параметров; видеопотоки", "")
+
+            
+            Rel(ms_device_adapters, smarthome_queue, "Сохранение агрегированных данных", "")
+            Rel(smarthome_queue, ms_device_history, "Сохранение агрегированных данных", "")
+
+            
+
+        }   
+        }   
+    }
+}
+
+
+
+
+'##########
+'  КЛИЕНТ  
+'##########
+Rel_D(user, front_web, "<<Uses>>", "")
+Rel_D(user, front_android, "<<Uses>>", "")
+Rel_D(user, front_ios, "<<Uses>>", "")
+
+BiRel_D(user_gw, front_web, "Обмен данными")
+BiRel_D(user_gw, front_android, "Обмен данными", "")
+BiRel_D(user_gw, front_ios, "Обмен данными", "")
+
+BiRel_D(user_gw, ms_bff, "Обмен данными")
+
+BiRel_D(user_gw, ms_auth, "Аутентификация и авторизация", "")
+
+BiRel(ms_bff, ms_general_backend, "Обмен данными", "")
+BiRel(ms_bff, ms_automation_scenario, "Обмен данными", "")
+
+
+
+'##########
+'  Датчик  
+'##########
+Rel_D(sensor, system_gw, "Отправляет данные")
+
+'##########
+'  Актуатор  
+'##########
+Rel(actuator, system_gw, "Отправляет данные")
+
+
+@enduml

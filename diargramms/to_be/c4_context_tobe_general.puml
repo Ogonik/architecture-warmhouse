@@ -1,6 +1,8 @@
-@startuml Basic Sample
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+@startuml Smart Home C4 Context General Diagramm 
+
+!include ..\lib\C4_Container.puml
+!include ..\lib\C4_Context.puml
+
 title
  General <u>Context diagram</u> TO BE for Smart Home Application in common
 end title
@@ -18,6 +20,7 @@ Boundary(sm, "Smart Home") {
 
     System_Boundary(sm_bound, "Smart home Application") {
         System(main_app, "SmartHome ", "Основное приложение", "", "React, C#, PostgreSQL")
+        
     }
     System_Ext(sensor, "Датчик, совместимый с приложением")
     System_Ext(actuator, "Актуатор, совместимый с приложением")

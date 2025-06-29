@@ -1,0 +1,52 @@
+@startuml Samrt Home C4 Component Diagram
+
+!include ..\lib\C4_Context.puml
+!include ..\lib\C4_Container.puml
+!include ..\lib\C4_Component.puml
+
+
+'skinparam linetype ortho
+Boundary(devices_microservices, "Backend services for devices' information") {
+    Boundary(ms_device_adapters, "Сервис адаптеров протоколов различных устройств, агрегация, очистка данных") {
+
+      Component(incoming_buffer, "Входной шлюз приема данных из брокера", "C#, REST API")
+      Component(device_adapters_low_level, "Слой использования библиотек чтения данных от оконечных устройств", "Devices' dll||so")
+      Component(device_adapters_high_level, "Слой DTO для перехода к модели данных Smart Home")
+      Component(data_verification, "Слой логики для верификации данных")
+      Component(data_interpolation, "Слой логики для интерполяции пропущенных значений")
+      Component(data_batching, "Слой логики для агрегации высокочастотных значений")
+      
+      ContainerQueue(adapters_mq, "Локальная очередь для долгих заданий", "C#, in-memory local service inside service process")
+
+      ComponentDb(cache, "Кеш для хранения серии значений показателей конкретного оконечного прибора (верификация, интерполяция, агрегация)", "Redis || Tarantool")
+      Component(config, "Конфигуратор модулей сервиса")
+    } 
+    ContainerQueue_Ext(smarthome_queue, "MessageBroker", "Kafka||Apache Camel based queues")
+    Container_Ext(system_gw, "System Gateway", "Nginx", "Devices Reverse Proxy, Authentication") 
+
+    Rel(config, device_adapters_low_level, "Конфигурация библиотек для чтения протоколов оконечных устройств", "")
+    Rel(config, data_verification, "Конфигурации для верификации данных", "")
+    Rel(config, data_interpolation, "Конфигурации для интерполяции данных", "")
+    Rel(config, data_batching, "Конфигурации для агрегации данных", "")
+
+    BiRel(cache, data_verification, "Обмен данными", "")
+    BiRel(cache, data_interpolation, "Обмен данными", "")
+    BiRel(cache, data_batching, "Обмен данными", "")
+
+    Rel(system_gw, incoming_buffer, "Входящий поток данных", "", "", "", $tags="Sage")
+    Rel(incoming_buffer, device_adapters_low_level, "Gоток данных", "", "", "", $tags="Sage")
+    Rel(device_adapters_low_level, device_adapters_high_level, "Поток данных", "", "", "", $tags="Sage")
+    Rel(device_adapters_high_level, adapters_mq, "Поток данных", "", "", "", $tags="Sage")
+    
+    Rel(adapters_mq, data_verification, "Задания на верификацию", "", "", "", $tags="Sage")
+    Rel(adapters_mq, data_interpolation, "Задания на интерполяцию", "", "", "", $tags="Sage")
+    Rel(adapters_mq, data_batching, "Задания на агрегацию", "", "", "", $tags="Sage")
+    Rel(adapters_mq, data_verification, "Результаты верификации", "", "", "", $tags="Sage")
+    Rel(adapters_mq, data_interpolation, "Результаты интерполяции", "", "", "", $tags="Sage")
+    Rel(adapters_mq, data_batching, "Результаты агрегации", "", "", "", $tags="Sage")
+
+    Rel(data_batching, smarthome_queue, "Исходящий поток данных", "", "", "", $tags="Sage")
+ 
+  }
+
+@enduml

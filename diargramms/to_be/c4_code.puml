@@ -1,0 +1,68 @@
+@startuml SmartHome UML Sequence Diagramm. Service ms_device_adapters
+
+title "SmartHome UML Sequence Diagramm. Service ms_device_adapters. Processing incoming message. Happy path"
+
+actor "Ext System GateWay" as sgw order 1
+participant "incoming_buffer" as inb order 2
+participant "device_adapters_low_level" as dall order 3
+participant "device_adapters_high_level" as dahl order 4
+participant "adapters_mq" as q order 5
+participant "data_verification" as dv order 6
+participant "data_interpolation" as di order 7
+participant "data_batching" as db order 8
+database "cache" as c order 9
+actor "Ext Broker" as eb order 10
+
+autonumber
+
+
+sgw++
+sgw -> inb: Вызов API метода\n приема данных 
+inb++
+inb -> inb: Валидация входных данных
+inb -> sgw: OK 200
+sgw--
+inb -> dall: Данные на расшифроку
+inb--
+dall++
+dall -> dall: Выбрать устройство и протокол в \n соответствие с входными данными
+dall -> dall: Дешифровать данные в соответствие \n с протоколом устройства
+dall -> dahl: Данные на преобразование в модель \n данных SmartHome
+dall--
+dahl++
+dahl -> dahl: Перевести данные в модель SmartHome
+dahl -> dahl: Создать сагу на обработку данных
+dahl -> c: положить данные в кеш
+dahl ->> q: Сага на обработку данных
+dahl-- 
+
+q ->> dv: Задание на верификацию
+dv++ 
+dv -> c : Запрос данных из кеша при необходимости 
+dv <- c : Кешированные данные 
+dv -> dv : Выполнить верификацию 
+q <<- dv: Результаты верификации
+dv--
+
+q ->> di: Задание на интерполяцию
+di++ 
+di -> c : Запрос данных из кеша при необходимости 
+di <-- c : Кешированные данные 
+di -> di : Выполнить интерполяцию 
+q <<- di: Результаты интерполяции
+di--
+
+
+q ->> db: Задание на агрегацию
+db++ 
+db -> c : Запрос данных из кеша при необходимости 
+db <-- c : Кешированные данные 
+db -> db : Выполнить агрегацию 
+
+db -> eb : Финальное значение параметра с датчика
+
+db--
+
+
+@enduml
+

@@ -1,0 +1,208 @@
+@startuml Samrt Home ER Diagram
+
+!include ..\lib\C4_Container.puml
+!include ..\lib\C4_Context.puml
+
+'skinparam linetype ortho
+
+left to right direction
+
+  entity "User" {
+    * id : GUID <<generated>>
+    --
+    first_name : VARCHAR
+    last_name : VARCHAR
+    middle_name : VARCHAR
+    * email : VARCHAR 
+    * password: VARCHAR 
+    telephone  : VARCHAR
+  }
+
+Boundary(auth, "Authorization and audit entities") {
+    entity "AccessRight" {
+      * id : GUID <<generated>>
+      --
+      name : VARCHAR
+      * code : VARCHAR
+    }
+
+    entity "Role" {
+      * id : GUID <<generated>>
+      --
+      * name : VARCHAR
+      * code : VARCHAR
+      parent_id: GUID
+    }
+
+    Role::id "1" ||--o{ "n" Role::parent_id
+    Role::id "n" |o--o{ "n" AccessRight::id
+    User::id "n" |o--o{ "n" Role::id
+  }
+Boundary(finance, "Finance entities") {
+
+    entity "BillingPlan" {
+      * id : GUID <<generated>>
+      --
+      * name : VARCHAR
+      * code : VARCHAR
+    }
+
+    entity "UserBillingPlan" {
+      * id : GUID <<generated>>
+      --
+      * user_id : GUID <<FK>>
+      * billing_plan_id : <<FK>>
+      * start_datetime: TIMESTAMP
+      end_datetime: TIMESTAMP
+    }
+    BillingPlan::id "1" ||--|{ "n" UserBillingPlan::billing_plan_id
+    User::id "1"        ||--|{ "n" UserBillingPlan::user_id
+
+    entity "Payment" {
+      * id : GUID <<generated>>
+      --
+      * datetime : TIMESTAMP
+      * payment_info : JSONB
+      * anount: DECIMAL
+      * currency: GUID <<FK>>
+      * user_billing_plan_id: GUID <<FK>>
+    }
+
+    UserBillingPlan::id "1" ||--|{ "n" Payment::user_billing_plan_id
+  }
+
+Boundary(device, "Device entities") {
+
+  entity "Device" {
+    * id : GUID <<generated>>
+    --
+    * type_id : GUID <<FK>>
+    * manufacturer_id : GUID <<FK>>
+    * model_id : GUID <<FK>>
+    updated_at : TIMESTAMP
+    * created_at : TIMESTAMP 
+    * is_deleted : BOOL <<default>> FALSE
+  }
+
+   entity "DeviceType" {
+    * id : GUID <<generated>>
+    --
+    * name : VARCHAR
+  }
+
+  DeviceType::id "1" ||--o| "n" Device::type_id
+
+  entity "UserDeviceName" {
+    * id : GUID <<generated>>
+    --
+    * user_id: GUID <<FK>>
+    * device_id: GUID <<FK>>
+    * device_scenario_code: VARCHAR
+    ui_name: VARCHAR
+  }
+
+  Device::id "1"  ||--|{ "n" UserDeviceName::device_id
+  User::id "1"    ||--|{ "n" UserDeviceName::user_id
+
+  entity "DeviceManufacturer" {
+    * id : GUID <<generated>>
+    --
+    * name : VARCHAR
+  }
+  
+  entity "DeviceModel" {
+    * id : GUID <<generated>>
+    --
+    * manufacturer_id: GUID <<FK>>
+    * name : VARCHAR
+  }
+  
+  DeviceManufacturer::id "1" ||--|{ "n" DeviceModel::manufacturer_id
+  DeviceModel::id "1"        ||--|{ "n" Device::model_id
+  
+  entity "Location" {
+    * id : GUID <<generated>>
+    --
+    * name : VARCHAR
+    parent_id: GUID <<FK>>
+    * user_id: GUID <<FK>>
+  }
+
+  User::id      "1" ||--|{ "n" Location::user_id
+  Location::id  "1" ||--o{ "n" Location::parent_id
+  Device::id    "n" ||--|{ "n" Location::id
+
+  entity "AutomationScenario" {
+    * id : GUID <<generated>>
+    --
+    * user_id: GUID <<FK>>
+    * scenario_bpm: BLOB
+  }
+
+  User::id "1" ||--|{ "n" AutomationScenario::user_id
+
+  entity "DeviceActionType" {
+    * id : GUID <<generated>>
+    --
+    * name : VARCHAR
+  }
+
+  entity "DeviceActionHistroy" {
+    * id : GUID <<generated>>
+    --
+    * automation_scenario_id: GUID <<FK>>
+    * datetime: Timestamp
+    * device_id: GUID <<FK>>
+    * action_type_id: GUID <<FK>>
+    initial_state: JSONB
+    final_state: JSONB
+  }
+    AutomationScenario::id "1"  ||--|{ "n" DeviceActionHistroy::automation_scenario_id
+    Device::id "1"              ||--|{ "n" DeviceActionHistroy::device_id
+    DeviceActionType::id "1"    ||--|{ "n" DeviceActionHistroy::action_type_id
+
+  entity "MeasurementRawItem" {
+    * id : GUID <<generated>>
+    --
+    * datetime: Timestamp
+    * device_id: GUID <<FK>>
+    * parameter_id: GUID <<FK>>
+    * value: VARCHAR
+  }
+
+   entity "DeviceVideoFragment" {
+    * id : GUID <<generated>>
+    --
+    * start_datetime: Timestamp
+    * end_datetime: Timestamp
+    * device_id: GUID <<FK>>
+    * link: VARCHAR
+  }
+
+  entity "MeasurementArrgegateItem" {
+    * id : GUID <<generated>>
+    --
+    * start_datetime: Timestamp
+    * end_datetime: Timestamp
+    * device_id: GUID <<FK>>
+    * parameter_id: GUID <<FK>>
+    * value: VARCHAR
+  }
+
+  entity "DeviceParameter" {
+    * id : GUID <<generated>>
+    --
+    * name : VARCHAR
+    * dimension: VARCHAR
+  }
+
+  DeviceParameter::id "1" ||--|{ "n" MeasurementRawItem::parameter_id
+  Device::id "1"          ||--|{ "n" MeasurementRawItem::device_id
+
+  Device::id "1"          ||--|{ "n" DeviceVideoFragment::device_id
+
+  DeviceParameter::id "1" ||--|{ "n" MeasurementArrgegateItem::parameter_id
+  Device::id "1"          ||--|{ "n" MeasurementArrgegateItem::device_id
+}
+
+@enduml

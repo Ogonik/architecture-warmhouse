@@ -1,0 +1,419 @@
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+
+openapi: "3.0.1"
+info:
+  title: "SmartHome API. Service name : BFF"
+  description: ""
+  contact:
+    email: example@example.org
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: https://swagger.io
+
+tags:
+  - name: user
+    description: User entity methods example
+  - name: automation_scenario
+    description: AutomationScenario Entity methods example
+  - name: location_history
+    description: DeviceHistory methods
+
+paths:
+  /user:
+    post:
+      tags:
+        - user
+      security:
+        - {}
+      summary: Create user.
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      
+
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: Logs user into the system.
+      description: Log into the system.
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                type: string
+        "403":
+          description: Invalid username/password supplied
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /user/{user_id}:
+    put:
+      tags:
+        - user
+      summary: Update user resource.
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: user_id
+          in: path
+          description: name that need to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: bad request
+        "404":
+          description: user not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - bearerHttpAuthentication: []
+
+  /location_history/{user_id}/{location_id}:
+    get:
+      tags:
+        - location_history
+      summary: Gets general info about User's Location.
+      description: ""
+      operationId: getLocationInfo
+      parameters:
+        - name: user_id
+          in: path
+          description: user id that need to be requested
+          required: true
+          schema:
+            type: string
+        - name: location_id
+          in: path
+          description: location_id that need to be requested
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocationInfo"
+            
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Location || User not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - bearerHttpAuthentication: []
+
+  /location_history/{user_id}/{location_id}/{device_id}:
+    get:
+      tags:
+        - location_history
+      summary: Find pet by ID.
+      description: Returns a device params history.
+      operationId: getDeviceHistoryById
+      parameters:
+        - name: user_id
+          in: path
+          description: user id that need to be requested
+          required: true
+          schema:
+            type: string
+        - name: location_id
+          in: path
+          description: location_id that need to be requested
+          required: true
+          schema:
+            type: string
+        - name: device_id
+          in: path
+          description: device_id that need to be requested
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceInfo"
+            
+        "400":
+          description: Invalid ID supplied
+        "404":
+          description: Location || User not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - bearerHttpAuthentication: []
+
+  /automation_scenario/{user_id}/devices:
+    get:
+      tags:
+        - automation_scenario
+      summary: Returns user devices available to use in automation scenario.
+      operationId: getScenarioAvailableDevices
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceInfoArray"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - bearerHttpAuthentication: []
+
+  /automation_scenario/{user_id}:
+    post:
+      tags:
+        - automation_scenario
+      summary: Place an automation scenario for a User.
+      operationId: placeScenario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutomationScenario"
+
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutomationScenarioCreateResponse"
+        "400":
+          description: Invalid input
+        "422":
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - bearerHttpAuthentication: []
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 66d89b0b-eaae-4853-90c3-238d4531bd1a
+        username:
+          type: string
+          example: theUser
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: "12345"
+        phone:
+          type: string
+          example: "+7 (123) 456-78-90"
+    
+    LocationInfo:
+      required:
+        - id
+        - name
+        - user
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 66d89b0b-eaae-4853-90c3-238d4531bd1a
+        name:
+          type: string
+          example: Home
+        user:
+          type: object
+          $ref: "#/components/schemas/User"
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/LocationInfo"
+        devices:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeviceInfo"
+
+    
+    DeviceInfo:
+      required:
+        - id
+        - name
+        - type
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 66d89b0b-eaae-4853-90c3-238d4531bd1a
+        name:
+          type: string
+          example: DeviceName
+        model_name:
+          type: string
+          example: Device Model Name
+        manufacturer_name:
+          type: string
+          example: Device Manufacturer Name
+        type:
+          type: string
+          enum:
+            - sensor
+            - actuator
+            - fake
+     
+    DeviceInfoArray:
+      type: array
+      items: 
+        $ref: "#/components/schemas/DeviceInfo"
+
+    AutomationScenario:
+      required:
+        - id
+        - name
+        - user_id
+        - scenario_json
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 66d89b0b-eaae-4853-90c3-238d4531bd1a
+        name:
+          type: string
+          example: ScenarioName
+        user_id:
+          type: string
+          format: uuid
+          example: 66d89b0b-eaae-4853-90c3-238d4531bd1a
+        scenario_json:
+          type: string
+    
+    AutomationScenarioCreateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: uuid for saved scenario
+          format: uuid
+          example: 66d89b0b-eaae-4853-90c3-238d4531bd1a
+        error_text:
+          type: string
+          example: some error text
+        message_text:
+          type: string
+          example: some ok message text
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+
+  requestBodies: {}
+
+  securitySchemes:
+    bearerHttpAuthentication:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
